@@ -8,6 +8,7 @@ struct Song {
     std::string title;
     std::string singer;
     std::vector<std::string> lyrics;
+    std::string imageUrl;
 };
 
 
@@ -38,7 +39,8 @@ public:
                     "Every day, I will remind you, oh",
                     "We find out what we're made of",
                     "When we are called to help our friends in need"
-                }
+                },
+                "https://i.scdn.co/image/ab67616d0000b273f6b55ca93bd33211227b502b"
             },
             {
                 "Photograph",
@@ -71,7 +73,8 @@ public:
                     "Where our eyes are never closin'",
                     "Hearts were never broken",
                     "And time's forever frozen still"
-                }
+                },
+                "https://i.scdn.co/image/ab67616d0000b27313b3e37318a0c247b550bccd"
             },
             {
                 "Raabta",
@@ -95,7 +98,8 @@ public:
                     "Khuda ne iss jahaan mein",
                     "Sabhi ke liye kisi na kisi ko hai banaaya",
                     "har kisi ke liye…"
-                }
+                },
+                "https://popcornsg.s3.amazonaws.com/movies/650/4214-12374-Raabta.jpg"
             },
             {
                 "A Thousand Years",
@@ -123,7 +127,8 @@ public:
                     "Darling, don't be afraid",
                     "I have loved you for a thousand years",
                     "I'll love you for a thousand more"
-                }
+                },
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuZ9hMAX37Tvu-p9CMpdzc7cCDEltW9t-BdQ&s"
             },
             {
                 "Dil Diyaa Gallan",
@@ -148,7 +153,8 @@ public:
                     "Dil diyan gallan",
                     "Karange naal naal beh ke",
                     "Akh naal akh nu mila ke"
-                }
+                },
+                "https://i.scdn.co/image/ab67616d0000b2736b0dddf772efee7cc90d3443"
             }
         };
     }
@@ -172,20 +178,27 @@ public:
             crow::json::wvalue result;
             result["songs"] = crow::json::wvalue::list(songs.size());
 
-            for (size_t i = 0; i < songs.size(); i++) {
-                result["songs"][i]["title"] = songs[i].title;
-                result["songs"][i]["singer"] = songs[i].singer;
+    for (size_t i = 0; i < songs.size(); i++) {
+        result["songs"][i]["title"] = songs[i].title;
+        result["songs"][i]["singer"] = songs[i].singer;
 
-                result["songs"][i]["lyrics"] =
-                    crow::json::wvalue::list(songs[i].lyrics.size());
+        result["songs"][i]["lyrics"] =
+            crow::json::wvalue::list(songs[i].lyrics.size());
 
-                for (size_t j = 0; j < songs[i].lyrics.size(); j++) {
-                    result["songs"][i]["lyrics"][j] = songs[i].lyrics[j];
-                }
-            }
+        result["songs"][i]["imageUrl"] = songs[i].imageUrl;
 
-            return result;
-        });
+        for (size_t j = 0; j < songs[i].lyrics.size(); j++) {
+            result["songs"][i]["lyrics"][j] = songs[i].lyrics[j];
+        }
+    }
+
+    crow::response res(result.dump());
+    res.add_header("Access-Control-Allow-Origin", "*");
+    res.add_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.add_header("Access-Control-Allow-Headers", "Content-Type");
+
+    return res;
+});
     }
 };
 
