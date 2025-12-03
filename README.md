@@ -15,3 +15,5 @@ Open another terminal
 ```bash
 npm run dev
 ```
+
+### See output in http://localhost:3000/
