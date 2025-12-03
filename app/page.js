@@ -1,4 +1,6 @@
 "use client";
+import MusicPlayerCard from "./MusicPlayerCard/page";
+
 
 import { useState } from "react";
 
@@ -26,38 +28,31 @@ export default function Home() {
       setMessage("Error: " + err.message);
     }
   }
+  <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+/>
+
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Crow + Next.js</h1>
+  <div className="min-h-screen bg-neutral-950 p-6 text-white font-spotify flex flex-col items-center">
+      <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+/>
+  
+  <header className="mb-20 text-center">
+    <h1 className="text-4xl font-bold tracking-tight">
+      LyricStream
+    </h1>
+    <p className="mt-2 text-lg text-neutral-400 ">
+      Play songs and watch lyrics flow in perfect sync
+    </p>
+  </header>
 
-      <input
-        type="text"
-        placeholder="Enter your name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        style={{
-          padding: "10px",
-          border: "1px solid #999",
-          borderRadius: "6px",
-          marginRight: "10px",
-        }}
-      />
+ 
+  <MusicPlayerCard />
+</div>
 
-      <button
-        onClick={sayHello}
-        style={{
-          padding: "10px 20px",
-          background: "black",
-          color: "white",
-          borderRadius: "6px",
-          cursor: "pointer"
-        }}
-      >
-        Say Hello
-      </button>
-
-      <h2 style={{ marginTop: "20px" }}>{message}</h2>
-    </div>
   );
 }
