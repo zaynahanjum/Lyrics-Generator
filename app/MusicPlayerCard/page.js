@@ -1,9 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function MusicPlayerCard({lyricsLines, songName, singer, imageUrl}) {
-  const [current, setCurrent] = useState(225);
+export default function MusicPlayerCard({
+  lyricsLines,
+  songName,
+  singer,
+  imageUrl,
+  onNext,
+  onPrev,
+}) {
+  const [displayedLyrics, setDisplayedLyrics] = useState("");
+  const [wordIndex, setWordIndex] = useState(0);
+  const [current, setCurrent] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-
   const total = 245;
 
   const formatTime = (s) => {
@@ -14,26 +22,50 @@ export default function MusicPlayerCard({lyricsLines, songName, singer, imageUrl
 
   const lyrics = lyricsLines.join("\n");
 
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    const words = lyrics.split(" ");
+
+    const interval = setInterval(() => {
+      setDisplayedLyrics((prev) => prev + words[wordIndex] + " ");
+      setWordIndex((i) => i + 1);
+    }, 300);
+
+    if (wordIndex >= words.length) {
+      clearInterval(interval);
+    }
+
+    return () => clearInterval(interval);
+  }, [isPlaying, wordIndex]);
+
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    const interval = setInterval(() => {
+      setCurrent((c) => {
+        if (c >= total) {
+          onNext();
+          return 0;
+        }
+        return c + 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isPlaying]);
+
   return (
-    <div className="w-full flex justify-center ">
-
+    <div className="w-full flex justify-center">
       <div className={`flex items-start ${isPlaying ? "gap-8" : ""}`}>
-
-
         <div className="w-[350px] shrink-0 rounded-xl bg-neutral-900 p-4 text-white shadow-lg">
-
-
           <div className="aspect-square w-full overflow-hidden rounded-lg bg-neutral-800">
-            <img
-              src={imageUrl}
-              alt="Album Art"
-              className="h-full w-full object-cover"
-            />
+            <img src={imageUrl} alt="Album Art" className="h-full w-full object-cover" />
           </div>
 
           <div className="mt-4">
             <h1 className="text-xl font-semibold font-spotify">{songName}</h1>
-            <p className="mt-1 text-sm text-neutral-400 font-spotify">{singer}</p>
+            <p className="mt-1 text-sm text-neutral-400">{singer}</p>
           </div>
 
           <div className="mt-4">
@@ -52,15 +84,26 @@ export default function MusicPlayerCard({lyricsLines, songName, singer, imageUrl
           </div>
 
           <div className="mt-4 flex items-center justify-between">
-            <button className="rounded-full p-2 hover:bg-neutral-800"><i className="fa-solid fa-heart"></i>
-            </button>
-
-            <button className="rounded-full p-2 hover:bg-neutral-800"><i className="fa-solid fa-backward-step"></i>
+            <button className="rounded-full p-2 hover:bg-neutral-800">
+              <i className="fa-solid fa-heart"></i>
             </button>
 
             <button
-              onClick={() => setIsPlaying(!isPlaying)}
-              className="rounded-full bg-green-500 p-5 h-6 w-6 text-black flex  items-center justify-center "
+              onClick={onPrev}
+              className="rounded-full p-2 hover:bg-neutral-800"
+            >
+              <i className="fa-solid fa-backward-step"></i>
+            </button>
+
+            <button
+              onClick={() => {
+                setIsPlaying(!isPlaying);
+                if (!isPlaying) {
+                  setDisplayedLyrics("");
+                  setWordIndex(0);
+                }
+              }}
+              className="rounded-full bg-green-500 p-5 h-6 w-6 text-black flex items-center justify-center"
             >
               {isPlaying ? (
                 <i className="fa-solid fa-pause"></i>
@@ -69,31 +112,27 @@ export default function MusicPlayerCard({lyricsLines, songName, singer, imageUrl
               )}
             </button>
 
-            <button className="rounded-full p-2 hover:bg-neutral-800"><i className="fa-solid fa-forward-step"></i>
+            <button
+              onClick={onNext}
+              className="rounded-full p-2 hover:bg-neutral-800"
+            >
+              <i className="fa-solid fa-forward-step"></i>
             </button>
 
-            <button className="rounded-full p-2 hover:bg-neutral-800"><i className="fa-solid fa-star"></i>
+            <button className="rounded-full p-2 hover:bg-neutral-800">
+              <i className="fa-solid fa-star"></i>
             </button>
           </div>
         </div>
 
         {isPlaying && (
-          <div className="w-[350px] h-full shrink-0 rounded-2xl bg-[#1A1A1A] p-6 text-white shadow-[0_4px_20px_rgba(0,0,0,0.3)]">
-
-
-            <h2 className="text-[30px] font-semibold tracking-wide opacity-90">
-              Lyrics
-            </h2>
-
-
-            <div class="mt-4 h-[340px] overflow-y-auto whitespace-pre-line text-[1.05rem] leading-relaxed text-white/90 font-medium">
-              {lyrics}
+          <div className="w-[350px] h-full shrink-0 rounded-2xl bg-[#1A1A1A] p-6 text-white shadow-lg">
+            <h2 className="text-[30px] font-semibold tracking-wide opacity-90">Lyrics</h2>
+            <div className="mt-4 h-[340px] overflow-y-auto whitespace-pre-line text-[1.05rem] leading-relaxed">
+              {displayedLyrics}
             </div>
-
           </div>
         )}
-
-
       </div>
     </div>
   );
