@@ -161,7 +161,6 @@ public:
 };
 
 
-//SongController CLASS
 
 class SongController {
 private:
